@@ -3,6 +3,8 @@
 code="./solution.js"
 store="./backup"
 cases="./cases"
+notes="./notes"
+name=""
 
 read_std_input() {
   [ -f $1 ] && rm $1
@@ -17,7 +19,6 @@ read_std_input() {
 }
 
 cleanup() {
-  kill $nodemon_id
   cp $code $store
   rm $code
   [ -d "$store/$cases" ] && rm -r "$store/$cases"
@@ -27,10 +28,13 @@ cleanup() {
 
 get_sample_data() {
   [ -d $cases ] || mkdir $cases
+  [ -d "$cases/input" ] || mkdir "$cases/input"
+  [ -d "$cases/output" ] || mkdir "$cases/output"
+
   echo "sample input:"
-  read_std_input "$cases/input00.txt"
+  read_std_input "$cases/input/inputXX.txt"
   echo "sample output:"
-  read_std_input "$cases/output00.txt"
+  read_std_input "$cases/output/outputXX.txt"
 }
 
 get_cases() {
@@ -41,6 +45,14 @@ get_cases() {
   unzip *.zip
   cd ../
 }
+
+
+while getopts "a" flag
+do
+    case "${flag}" in
+        a) get_sample_data && exit;;
+    esac
+done
 
 [ -d "$store" ] || mkdir "$store"
 printf "url> "
@@ -54,4 +66,14 @@ nodemon_id=$(ps aux | grep -e "nodemon" -m 1 | awk '{ print $2 }')
 trap cleanup EXIT
 
 st "nvim" $code
-echo "finished"
+kill $nodemon_id
+
+printf "document the question? [$name]> "
+read ans
+
+if [ "$ans" = "y" ]
+then
+  fileName="$notes/$name.md"
+  echo "# $name" > "$fileName"
+  nvim "$fileName"
+fi
