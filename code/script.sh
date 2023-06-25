@@ -19,6 +19,25 @@ read_std_input() {
 }
 
 cleanup() {
+  kill $nodemon_id
+  read null
+  printf "document the question? [$name]> "
+  read ansa
+  
+  if [ "$ansa" = "y" ]
+  then
+    fileName="$notes/$name.md"
+    echo "# $name" > "$fileName"
+    nvim "$fileName"
+  fi
+  
+  printf "solved the question? [$name]> "
+  read ansb
+  if [ "$ansb" = "y" ]
+  then
+    echo "$(date '+%d/%m/%g %H:%M') $name" >> "./list.txt"
+  fi
+
   cp $code $store
   rm $code
   [ -d "$store/$cases" ] && rm -r "$store/$cases"
@@ -66,14 +85,3 @@ nodemon_id=$(ps aux | grep -e "nodemon" -m 1 | awk '{ print $2 }')
 trap cleanup EXIT
 
 st "nvim" $code
-kill $nodemon_id
-
-printf "document the question? [$name]> "
-read ans
-
-if [ "$ans" = "y" ]
-then
-  fileName="$notes/$name.md"
-  echo "# $name" > "$fileName"
-  nvim "$fileName"
-fi
