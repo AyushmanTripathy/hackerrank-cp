@@ -1,6 +1,6 @@
 #!/bin/sh
 
-code="./solution.js"
+code="./solution.cpp"
 store="./backup"
 cases="./cases"
 notes="./notes"
@@ -19,6 +19,7 @@ read_std_input() {
 }
 
 cleanup() {
+  echo "Exiting... "
   kill $nodemon_id
   read null
   printf "document the question? [$name]> "
@@ -79,7 +80,7 @@ read url
 [ -z $url ] && get_sample_data || get_cases $url
 echo "started"
 
-nodemon -w "./" -w $cases --ignore "$store" -e "js,txt" -x "sh ./code/check.sh || exit 1" &
+nodemon -w "./" -w $cases --ignore "$store" -e "cpp,js,txt" -x "sh ./code/check.sh || exit 1" &
 nodemon_id=$(ps aux | grep -e "nodemon" -m 1 | awk '{ print $2 }')
 
 trap cleanup EXIT
